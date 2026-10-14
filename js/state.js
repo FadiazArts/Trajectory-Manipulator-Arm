@@ -40,7 +40,7 @@ export const state = {
     samplesCount: 100,
 
     // Transport Playback
-    isPlaying: true,
+    isPlaying: false,
     pingPong: true,
     direction: 1,
     speedMultiplier: 1.0,
