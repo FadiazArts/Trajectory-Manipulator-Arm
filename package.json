@@ -1,0 +1,21 @@
+{
+  "name": "firmdev-3d-manipulator-simulation",
+  "version": "1.0.0",
+  "description": "FirmDev Studio — 3-Link Manipulator & Hydraulic Trajectory 3D Simulation with Modular Architecture",
+  "type": "module",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve .",
+    "serve:py": "python3 -m http.server 8000"
+  },
+  "keywords": [
+    "robotics",
+    "threejs",
+    "inverse-kinematics",
+    "forward-kinematics",
+    "trajectory-planning",
+    "hydraulic-actuators"
+  ],
+  "author": "FirmDev Studio",
+  "license": "MIT"
+}

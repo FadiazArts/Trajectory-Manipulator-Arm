@@ -1,0 +1,152 @@
+/* ==================== 4. CENTER 3D VIEWPORT & FLOATING TRANSPORT DOCK ==================== */
+.center-stage-col {
+    grid-column: 3 / 4;
+    grid-row: 2 / 3;
+    position: relative;
+    background: #151924;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+}
+
+#canvasContainer {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#canvasContainer canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Floating Camera & Helper Pill Bar (Top of 3D Stage) */
+.stage-top-overlay {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    right: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.overlay-pill-group {
+    pointer-events: auto;
+    background: rgba(23, 26, 36, 0.82);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(160, 169, 192, 0.14);
+    border-radius: var(--radius-pill);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.stage-chip-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-silver);
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 11px;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: all 0.16s ease;
+}
+
+.stage-chip-btn:hover {
+    color: var(--text-white);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.stage-chip-btn.is-active {
+    background: var(--grad-blue);
+    color: var(--text-white);
+    box-shadow: 0 2px 10px rgba(69, 93, 220, 0.45);
+}
+
+/* Bottom Transport & Stepper Dock (Ref Image 1 Node Stepper 'Lorem - Ipsum - Dolor - Sit') */
+.stage-bottom-dock {
+    background: rgba(30, 35, 48, 0.94);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--card-border);
+    padding: 12px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 5;
+}
+
+.node-stepper-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    padding: 0 6px;
+}
+
+.node-step-btn {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    z-index: 2;
+    color: var(--text-slate);
+    font-size: 10.5px;
+    font-weight: 600;
+    transition: color 0.15s ease;
+}
+
+.node-step-btn:hover,
+.node-step-btn.active {
+    color: var(--text-white);
+}
+
+.node-circle {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #2F374C;
+    border: 2px solid #171A24;
+    transition: all 0.2s ease;
+}
+
+.node-step-btn.passed .node-circle {
+    background: var(--accent-mint);
+    box-shadow: 0 0 8px rgba(67, 209, 167, 0.6);
+}
+
+.node-step-btn.current .node-circle {
+    background: #FFFFFF;
+    transform: scale(1.25);
+    box-shadow: 0 0 12px #FFFFFF;
+}
+
+.transport-main-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+}
+
+.transport-btns {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+

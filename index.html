@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FirmDev Studio — 3-Link Manipulator & Hydraulic Trajectory 3D</title>
+
+    <!-- Three.js r128 & OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 Free Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Modular Stylesheet Architecture -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="app-shell">
+
+        <!-- ==================== 1. LEFT NAVIGATION ICON RAIL (Ref Image 3) ==================== -->
+        <nav class="nav-rail" aria-label="Workspace Navigation">
+            <div class="rail-brand" title="FirmDev Studio">FD</div>
+
+            <div class="rail-menu">
+                <button type="button" class="rail-btn is-active" id="railBtnPersp" onclick="setCameraView('iso')" title="Kamera Perspektif 3D">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3L2 8l10 5 10-5-10-5z"/><path d="M2 16l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </button>
+                <button type="button" class="rail-btn" id="railBtnHydraulics" onclick="focusOnHydraulics()" title="Inspeksi Zoom Silinder Hidrolik & Clevis">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+                </button>
+                <button type="button" class="rail-btn is-active" id="railBtnEnvelope" onclick="toggleSceneHelper('envelope')" title="Tampilkan Workspace Dome">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M3.6 9h16.8M3.6 15h16.8"/><path d="M12 3a15 15 0 0 1 0 18"/></svg>
+                </button>
+                <button type="button" class="rail-btn is-active" id="railBtnPayload" onclick="togglePayloadTransfer()" title="Simulasi Angkut Benda Kerja (Pick & Place)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                </button>
+                <button type="button" class="rail-btn is-active" id="railBtnJoints" onclick="toggleSceneHelper('joints')" title="Sumbu Koordinat Sendi (DH Triad)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+            </div>
+
+            <div class="rail-menu">
+                <button type="button" class="rail-btn" onclick="exportTrajectoryCSV()" title="Unduh Data CSV Trayektori">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </button>
+            </div>
+        </nav>
+
+        <!-- ==================== 2. TOP MODULAR KPI HEADER BAR (Ref Image 2) ==================== -->
+        <header class="top-kpi-bar">
+            <!-- Module 1: Brand & Active IK Status -->
+            <div class="kpi-card">
+                <div class="kpi-left">
+                    <div class="icon-badge badge-indigo">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    </div>
+                    <div class="kpi-titles">
+                        <span class="kpi-label">3-DOF Hydraulic Manipulator</span>
+                        <div class="kpi-value" style="font-size: 14.5px; font-weight: 700; letter-spacing: 0.045em;">FirmDev Studio</div>
+                    </div>
+                </div>
+                <span class="pill-tag pill-mint" id="ikStatusBadge">IK VALID</span>
+            </div>
+
+            <!-- Module 2: Linear TCP Velocity -->
+            <div class="kpi-card">
+                <div class="kpi-left">
+                    <div class="icon-badge badge-orange">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    </div>
+                    <div class="kpi-titles">
+                        <span class="kpi-label">Kecepatan Linear TCP</span>
+                        <div class="kpi-value mono">
+                            <span id="kpiLinearSpeed">0.00</span>
+                            <span class="kpi-unit">m/s</span>
+                        </div>
+                    </div>
+                </div>
+                <span class="mono" style="font-size: 11px; color: var(--accent-mint);" id="kpiPeakSpeed">+1.84 max</span>
+            </div>
+
+            <!-- Module 3: Total 3D Arc Length -->
+            <div class="kpi-card">
+                <div class="kpi-left">
+                    <div class="icon-badge badge-purple">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 17l6-6 4 4 8-8"/><polyline points="14 7 21 7 21 14"/></svg>
+                    </div>
+                    <div class="kpi-titles">
+                        <span class="kpi-label">Panjang Lintasan 3D</span>
+                        <div class="kpi-value mono">
+                            <span id="kpiArcLength">5.42</span>
+                            <span class="kpi-unit">m</span>
+                        </div>
+                    </div>
+                </div>
+                <span class="pill-tag pill-purple" id="kpiLawShort">QUINTIC</span>
+            </div>
+
+            <!-- Module 4: Hydraulic Piston Stroke Intensity (with Ref Image 2 Tick Bars) -->
+            <div class="kpi-card">
+                <div class="kpi-titles">
+                    <span class="kpi-label">Ekstensi Silinder Bahu</span>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+                        <span class="kpi-value mono" id="kpiCylStrokeMm">1,240</span>
+                        <span class="kpi-unit">mm</span>
+                        <div class="tick-bar-strip" id="headerTickStrip">
+                            <span class="lit-mint"></span><span class="lit-mint"></span><span class="lit-mint"></span><span class="lit-mint"></span><span class="lit-mint"></span><span class="lit-mint"></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+                <span class="pill-tag pill-mint">LOCKED</span>
+            </div>
+
+            <!-- Module 5: Remaining Distance to Target -->
+            <div class="kpi-card">
+                <div class="kpi-left">
+                    <div class="icon-badge badge-mint">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                    </div>
+                    <div class="kpi-titles">
+                        <span class="kpi-label">Jarak ke Target [B]</span>
+                        <div class="kpi-value mono">
+                            <span id="kpiDistRem">4.85</span>
+                            <span class="kpi-unit">m</span>
+                        </div>
+                    </div>
+                </div>
+                <span class="mono" style="font-size: 11px; color: var(--text-silver);" id="kpiProgressPct">0%</span>
+            </div>
+        </header>
+
+        <!-- ==================== 3. LEFT CONTROL COLUMN (370px) ==================== -->
+        <aside class="left-control-col">
+
+            <!-- CARD 1: FOLDER-TABBED WAYPOINT & GEOMETRY CONTROLLER (Ref Image 1 Bottom-Right) -->
+            <div class="folder-card-wrapper">
+                <div class="folder-tabs-bar" role="tablist">
+                    <button type="button" class="folder-tab is-active" id="tabBtnStart" onclick="switchFolderTab('start')">
+                        <span class="folder-tab-dot" style="background: var(--accent-mint);"></span>
+                        Posisi Awal [A]
+                    </button>
+                    <button type="button" class="folder-tab" id="tabBtnEnd" onclick="switchFolderTab('end')">
+                        <span class="folder-tab-dot" style="background: var(--accent-coral);"></span>
+                        Posisi Akhir [B]
+                    </button>
+                    <button type="button" class="folder-tab" id="tabBtnLinks" onclick="switchFolderTab('links')">
+                        <span class="folder-tab-dot" style="background: var(--accent-orange);"></span>
+                        3 Lengan
+                    </button>
+                </div>
+
+                <div class="folder-card-body">
+                    <!-- PANE A/B: WAYPOINT COORDINATES & JOINT ANGLES -->
+                    <div id="paneWaypoints" style="display: flex; flex-direction: column; gap: 12px;">
+                        <div class="card-header-row">
+                            <div>
+                                <h2 class="card-title" id="waypointCardTitle">Koordinat Posisi Awal [A]</h2>
+                                <p class="card-subtitle" id="waypointCardSub">Ubah titik awal end-effector secara dinamis</p>
+                            </div>
+                            <span class="pill-tag pill-mint" id="activePoseTag">POSE A</span>
+                        </div>
+
+                        <!-- Mode Input Switch: Cartesian IK vs Joint FK -->
+                        <div class="pill-switch-row">
+                            <button type="button" class="btn-pill is-active-mint" id="btnModeCart" onclick="setInputMode('cartesian')">
+                                Kartesian (X,Y,Z)
+                            </button>
+                            <button type="button" class="btn-pill" id="btnModeJoint" onclick="setInputMode('joint')">
+                                Sudut Sendi (θ₁..θ₃)
+                            </button>
+                        </div>
+
+                        <!-- Elbow Configuration Switch -->
+                        <div class="pill-switch-row">
+                            <button type="button" class="btn-pill is-active-blue" id="btnElbowUp" onclick="setElbowSign(1)" style="padding: 6px 10px; font-size: 11px;">
+                                Siku Atas (Elbow-Up)
+                            </button>
+                            <button type="button" class="btn-pill" id="btnElbowDown" onclick="setElbowSign(-1)" style="padding: 6px 10px; font-size: 11px;">
+                                Siku Bawah (Elbow-Down)
+                            </button>
+                        </div>
+
+                        <!-- Glowing Gradient Sliders: Cartesian XYZ -->
+                        <div class="slider-group" id="cartesianSlidersBox">
+                            <div class="slider-item">
+                                <div class="slider-top-row">
+                                    <div class="slider-title-wrap">
+                                        <span class="slider-name" id="lblAxisX">Sumbu X (Maju/Mundur)</span>
+                                    </div>
+                                    <span class="mono" style="font-size: 11px; color: var(--accent-mint);" id="pctAxisX">75%</span>
+                                </div>
+                                <div class="slider-control-row">
+                                    <input type="range" class="grad-range" id="sliderPosX" min="-6.2" max="6.2" step="0.05" value="3.20" oninput="onWaypointParamInput('x', this.value)">
+                                    <input type="number" class="num-pill-input" id="numPosX" min="-6.2" max="6.2" step="0.05" value="3.20" oninput="onWaypointParamInput('x', this.value)">
+                                </div>
+                            </div>
+
+                            <div class="slider-item">
+                                <div class="slider-top-row">
+                                    <div class="slider-title-wrap">
+                                        <span class="slider-name" id="lblAxisY">Sumbu Y (Kiri/Kanan)</span>
+                                    </div>
+                                    <span class="mono" style="font-size: 11px; color: var(--accent-purple);" id="pctAxisY">32%</span>
+                                </div>
+                                <div class="slider-control-row">
+                                    <input type="range" class="grad-range purple-track" id="sliderPosY" min="-6.2" max="6.2" step="0.05" value="-2.20" oninput="onWaypointParamInput('y', this.value)">
+                                    <input type="number" class="num-pill-input" id="numPosY" min="-6.2" max="6.2" step="0.05" value="-2.20" oninput="onWaypointParamInput('y', this.value)">
+                                </div>
+                            </div>
+
+                            <div class="slider-item">
+                                <div class="slider-top-row">
+                                    <div class="slider-title-wrap">
+                                        <span class="slider-name" id="lblAxisZ">Sumbu Z (Ketinggian Vertikal)</span>
+                                    </div>
+                                    <span class="mono" style="font-size: 11px; color: var(--accent-orange);" id="pctAxisZ">48%</span>
+                                </div>
+                                <div class="slider-control-row">
+                                    <input type="range" class="grad-range orange-track" id="sliderPosZ" min="0.15" max="7.5" step="0.05" value="1.40" oninput="onWaypointParamInput('z', this.value)">
+                                    <input type="number" class="num-pill-input" id="numPosZ" min="0.15" max="7.5" step="0.05" value="1.40" oninput="onWaypointParamInput('z', this.value)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Glowing Gradient Sliders: Joint Angles (Hidden when in Cartesian mode) -->
+                        <div class="slider-group" id="jointSlidersBox" style="display: none;">
+                            <div class="slider-item">
+                                <div class="slider-top-row">
+                                    <span class="slider-name">Sendi 1 · Base Turret (θ₁)</span>
+                                    <span class="mono" style="font-size: 11px; color: var(--accent-mint);" id="degJoint1">-34°</span>
+                                </div>
+                                <div class="slider-control-row">
+                                    <input type="range" class="grad-range" id="sliderJoint1" min="-180" max="180" step="1" value="-34" oninput="onWaypointJointInput(0, this.value)">
+                                    <input type="number" class="num-pill-input" id="numJoint1" min="-180" max="180" step="1" value="-34" oninput="onWaypointJointInput(0, this.value)">
+                                </div>
+                            </div>
+
+                            <div class="slider-item">
+                                <div class="slider-top-row">
+                                    <span class="slider-name">Sendi 2 · Bahu Utama (θ₂)</span>
+                                    <span class="mono" style="font-size: 11px; color: var(--accent-purple);" id="degJoint2">+42°</span>
+                                </div>
+                                <div class="slider-control-row">
+                                    <input type="range" class="grad-range purple-track" id="sliderJoint2" min="-35" max="135" step="1" value="42" oninput="onWaypointJointInput(1, this.value)">
+                                    <input type="number" class="num-pill-input" id="numJoint2" min="-35" max="135" step="1" value="42" oninput="onWaypointJointInput(1, this.value)">
+                                </div>
+                            </div>
+
+                            <div class="slider-item">
+                                <div class="slider-top-row">
+                                    <span class="slider-name">Sendi 3 · Lengan Siku (θ₃)</span>
+                                    <span class="mono" style="font-size: 11px; color: var(--accent-orange);" id="degJoint3">-72°</span>
+                                </div>
+                                <div class="slider-control-row">
+                                    <input type="range" class="grad-range orange-track" id="sliderJoint3" min="-145" max="145" step="1" value="-72" oninput="onWaypointJointInput(2, this.value)">
+                                    <input type="number" class="num-pill-input" id="numJoint3" min="-145" max="145" step="1" value="-72" oninput="onWaypointJointInput(2, this.value)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5-Segment Axis Utilization Bars (Ref Image 1 Bottom-Right) -->
+                        <div class="seg-5-group">
+                            <div class="seg-5-row">
+                                <span class="seg-5-label">Reach XY</span>
+                                <div class="seg-5-bars" id="segBarsReach">
+                                    <span class="active-mint"></span><span class="active-mint"></span><span class="active-mint"></span><span></span><span></span>
+                                </div>
+                                <span class="mono" style="font-size: 10.5px; text-align: right; color: var(--text-silver);" id="segValReach">64%</span>
+                            </div>
+                            <div class="seg-5-row">
+                                <span class="seg-5-label">Elevasi Z</span>
+                                <div class="seg-5-bars" id="segBarsElev">
+                                    <span class="active-purple"></span><span class="active-purple"></span><span></span><span></span><span></span>
+                                </div>
+                                <span class="mono" style="font-size: 10.5px; text-align: right; color: var(--text-silver);" id="segValElev">38%</span>
+                            </div>
+                            <div class="seg-5-row">
+                                <span class="seg-5-label">Bahu θ₂</span>
+                                <div class="seg-5-bars" id="segBarsShoulder">
+                                    <span class="active-blue"></span><span class="active-blue"></span><span class="active-blue"></span><span></span><span></span>
+                                </div>
+                                <span class="mono" style="font-size: 10.5px; text-align: right; color: var(--text-silver);" id="segValShoulder">55%</span>
+                            </div>
+                        </div>
+
+                        <!-- Side-by-Side Pose [A] & [B] Quick Summary Cards -->
+                        <div class="pose-compare-strip">
+                            <div class="pose-mini-box active-a" id="miniBoxA" onclick="switchFolderTab('start')">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 10px; font-weight: 700; color: var(--accent-mint);">AWAL [A]</span>
+                                    <span class="mono" style="font-size: 9.5px; color: var(--text-slate);" id="miniJointsA">-34°,42°,-72°</span>
+                                </div>
+                                <div class="mono" style="font-size: 11px; font-weight: 600; color: var(--text-white);" id="miniXYZA">
+                                    3.20, -2.20, 1.40m
+                                </div>
+                            </div>
+
+                            <div class="pose-mini-box" id="miniBoxB" onclick="switchFolderTab('end')">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 10px; font-weight: 700; color: var(--accent-coral);">AKHIR [B]</span>
+                                    <span class="mono" style="font-size: 9.5px; color: var(--text-slate);" id="miniJointsB">44°,58°,-54°</span>
+                                </div>
+                                <div class="mono" style="font-size: 11px; font-weight: 600; color: var(--text-white);" id="miniXYZB">
+                                    2.60, 2.50, 3.20m
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Pill Buttons -->
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                            <button type="button" class="btn-pill outline-glow-mint" onclick="swapPoseAandB()" style="padding: 7px 6px; font-size: 11px;">
+                                Tukar A ↔ B
+                            </button>
+                            <button type="button" class="btn-pill" onclick="copyPoseAtoB()" style="padding: 7px 6px; font-size: 11px;">
+                                Salin A → B
+                            </button>
+                            <button type="button" class="btn-pill" onclick="randomizeValidPose()" style="padding: 7px 6px; font-size: 11px;">
+                                Pose Acak
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- PANE LINKS: 3-LINK MECHANICAL DIMENSIONS & GRIPPER -->
+                    <div id="paneLinks" style="display: none; flex-direction: column; gap: 12px;">
+                        <div class="card-header-row">
+                            <div>
+                                <h2 class="card-title">Dimensi 3 Lengan & Capit</h2>
+                                <p class="card-subtitle">Clevis hidrolik menyesuaikan otomatis</p>
+                            </div>
+                            <span class="pill-tag pill-purple" id="maxReachTag">R_MAX: 6.0m</span>
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="slider-item">
+                                <div class="slider-top-row">
+                                    <span class="slider-name">Lengan 1 · Tinggi Turret (L₁)</span>
+                                    <span class="mono" style="font-size: 11px; color: var(--accent-mint);" id="lblValL1">2.00 m</span>
+                                </div>
+                                <div class="slider-control-row">
+                                    <input type="range" class="grad-range" id="sliderL1" min="1.40" max="3.20" step="0.10" value="2.00" oninput="onLinkGeometryChange()">
+                                    <input type="number" class="num-pill-input" id="numL1" min="1.40" max="3.20" step="0.10" value="2.00" oninput="onLinkGeometryNumChange('L1', this.value)">
+                                </div>
+                            </div>
+
+                            <div class="slider-item">
+                                <div class="slider-top-row">
+                                    <span class="slider-name">Lengan 2 · Bahu Utama (L₂)</span>
+                                    <span class="mono" style="font-size: 11px; color: var(--accent-purple);" id="lblValL2">3.40 m</span>
+                                </div>
+                                <div class="slider-control-row">
+                                    <input type="range" class="grad-range purple-track" id="sliderL2" min="2.00" max="4.40" step="0.10" value="3.40" oninput="onLinkGeometryChange()">
+                                    <input type="number" class="num-pill-input" id="numL2" min="2.00" max="4.40" step="0.10" value="3.40" oninput="onLinkGeometryNumChange('L2', this.value)">
+                                </div>
+                            </div>
+
+                            <div class="slider-item">
+                                <div class="slider-top-row">
+                                    <span class="slider-name">Lengan 3 · Lengan Depan (L₃)</span>
+                                    <span class="mono" style="font-size: 11px; color: var(--accent-orange);" id="lblValL3">2.60 m</span>
+                                </div>
+                                <div class="slider-control-row">
+                                    <input type="range" class="grad-range orange-track" id="sliderL3" min="1.60" max="3.80" step="0.10" value="2.60" oninput="onLinkGeometryChange()">
+                                    <input type="number" class="num-pill-input" id="numL3" min="1.60" max="3.80" step="0.10" value="2.60" oninput="onLinkGeometryNumChange('L3', this.value)">
+                                </div>
+                            </div>
+
+                            <div class="slider-item">
+                                <div class="slider-top-row">
+                                    <span class="slider-name">Bukaan Jari End-Effector</span>
+                                    <span class="mono" style="font-size: 11px; color: var(--accent-sky);" id="lblValGrip">65%</span>
+                                </div>
+                                <div class="slider-control-row">
+                                    <input type="range" class="grad-range" id="sliderGripper" min="0" max="100" step="1" value="65" oninput="onGripperInput(this.value)">
+                                    <input type="number" class="num-pill-input" id="numGripper" min="0" max="100" step="1" value="65" oninput="onGripperInput(this.value)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 2: TRAJECTORY INTERPOLATION & SCHEDULE PRESETS (Ref Image 3 Bottom-Right) -->
+            <div class="ui-card">
+                <div class="card-header-row">
+                    <div>
+                        <h2 class="card-title">Hukum Trayektori & Preset</h2>
+                        <p class="card-subtitle">Interpolasi polinomial & profil kecepatan</p>
+                    </div>
+                    <span class="pill-tag pill-purple" id="lawSpaceBadge">JOINT</span>
+                </div>
+
+                <select id="interpLawSelect" class="modern-select" onchange="onInterpLawChange(this.value)">
+                    <option value="quintic">Quintic Polynomial — C² Halus (Orde 5)</option>
+                    <option value="cubic">Cubic Polynomial — C¹ Standar (Orde 3)</option>
+                    <option value="cartesian">Cartesian Linear — Garis Lurus 3D (IK)</option>
+                    <option value="lspb">Trapezoidal LSPB — Kecepatan Konstan</option>
+                </select>
+
+                <div class="slider-group">
+                    <div class="slider-item">
+                        <div class="slider-top-row">
+                            <span class="slider-name">Durasi Siklus (T)</span>
+                            <span class="mono" style="font-size: 11px; color: var(--accent-mint);" id="lblDuration">4.0 s</span>
+                        </div>
+                        <div class="slider-control-row">
+                            <input type="range" class="grad-range" id="sliderDuration" min="1.0" max="10.0" step="0.5" value="4.0" oninput="onTrajectoryTimingChange()">
+                            <input type="number" class="num-pill-input" id="numDuration" min="1.0" max="10.0" step="0.5" value="4.0" oninput="onDurationNumInput(this.value)">
+                        </div>
+                    </div>
+
+                    <div class="slider-item">
+                        <div class="slider-top-row">
+                            <span class="slider-name">Resolusi Sampel (N)</span>
+                            <span class="mono" style="font-size: 11px; color: var(--accent-purple);" id="lblSamples">100 pt</span>
+                        </div>
+                        <div class="slider-control-row">
+                            <input type="range" class="grad-range purple-track" id="sliderSamples" min="20" max="200" step="10" value="100" oninput="onTrajectoryTimingChange()">
+                            <input type="number" class="num-pill-input" id="numSamples" min="20" max="200" step="10" value="100" oninput="onSamplesNumInput(this.value)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Schedule-Style Preset Selector (Ref Image 3 Bottom-Right) -->
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 11px; font-weight: 600; color: var(--text-silver);">Skenario Industri</span>
+                    <span style="font-size: 10px; color: var(--text-slate);">Klik untuk uji posisi</span>
+                </div>
+
+                <div class="schedule-preset-strip">
+                    <button type="button" class="preset-slot is-selected" id="presetBtn1" onclick="applyIndustrialPreset('pickPlace', 1)">
+                        <span class="preset-num">01</span>
+                        <span class="preset-caption">Pick&Place</span>
+                    </button>
+                    <button type="button" class="preset-slot" id="presetBtn2" onclick="applyIndustrialPreset('highZenith', 2)">
+                        <span class="preset-num">02</span>
+                        <span class="preset-caption">High Z Up</span>
+                    </button>
+                    <button type="button" class="preset-slot" id="presetBtn3" onclick="applyIndustrialPreset('verticalWeld', 3)">
+                        <span class="preset-num">03</span>
+                        <span class="preset-caption">Vert Weld</span>
+                    </button>
+                    <button type="button" class="preset-slot" id="presetBtn4" onclick="applyIndustrialPreset('wideSweep', 4)">
+                        <span class="preset-num">04</span>
+                        <span class="preset-caption">Wide Sweep</span>
+                    </button>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- ==================== 4. CENTER 3D VIEWPORT & TRANSPORT DOCK ==================== -->
+        <main class="center-stage-col">
+
+            <div id="canvasContainer">
+                <!-- Floating Camera & Helper Pill Overlay -->
+                <div class="stage-top-overlay">
+                    <div class="overlay-pill-group">
+                        <button type="button" class="stage-chip-btn is-active" id="camPerspBtn" onclick="setCameraView('iso')">Perspektif 3D</button>
+                        <button type="button" class="stage-chip-btn" id="camHydraulicBtn" onclick="focusOnHydraulics()">Zoom Piston</button>
+                        <button type="button" class="stage-chip-btn" id="camTopBtn" onclick="setCameraView('top')">Atas [XY]</button>
+                        <button type="button" class="stage-chip-btn" id="camSideBtn" onclick="setCameraView('side')">Samping [XZ]</button>
+                        <button type="button" class="stage-chip-btn" id="camFrontBtn" onclick="setCameraView('front')">Depan [YZ]</button>
+                    </div>
+
+                    <div class="overlay-pill-group">
+                        <button type="button" class="stage-chip-btn is-active" id="toggleCompareBtn" onclick="toggleComparePath()">Jejak Komparasi</button>
+                        <button type="button" class="stage-chip-btn is-active" id="toggleTicksBtn" onclick="toggleWaypointTicks()">Titik Sampel</button>
+                        <button type="button" class="stage-chip-btn is-active" id="toggleVelVecBtn" onclick="toggleVelocityVector()">Vektor V</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Docked Timeline & Node Stepper (Ref Image 1) -->
+            <div class="stage-bottom-dock">
+                <!-- Checkpoint Node Stepper ('Awal 0% — 25% — Puncak 50% — 75% — Akhir 100%') -->
+                <div class="node-stepper-bar">
+                    <button type="button" class="node-step-btn passed" id="stepNode0" onclick="jumpToProgress(0.0)">
+                        <span>Awal [A]</span>
+                        <div class="node-circle"></div>
+                    </button>
+                    <button type="button" class="node-step-btn" id="stepNode25" onclick="jumpToProgress(0.25)">
+                        <span>Akselerasi 25%</span>
+                        <div class="node-circle"></div>
+                    </button>
+                    <button type="button" class="node-step-btn" id="stepNode50" onclick="jumpToProgress(0.50)">
+                        <span>Puncak 50%</span>
+                        <div class="node-circle"></div>
+                    </button>
+                    <button type="button" class="node-step-btn" id="stepNode75" onclick="jumpToProgress(0.75)">
+                        <span>Deselerasi 75%</span>
+                        <div class="node-circle"></div>
+                    </button>
+                    <button type="button" class="node-step-btn" id="stepNode100" onclick="jumpToProgress(1.0)">
+                        <span>Akhir [B]</span>
+                        <div class="node-circle"></div>
+                    </button>
+                </div>
+
+                <!-- Scrubber & Transport Controls -->
+                <div class="transport-main-row">
+                    <div class="transport-btns">
+                        <button type="button" class="btn-pill is-active-mint" id="playPauseBtn" onclick="togglePlayback()" style="min-width: 96px;" title="Jeda Simulasi [Spasi]">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" width="11" height="11" fill="currentColor" aria-hidden="true" style="display: inline-block; vertical-align: -1px; margin-right: 6px;"><path d="M48 64C21.5 64 0 85.5 0 112L0 400c0 26.5 21.5 48 48 48l32 0c26.5 0 48-21.5 48-48l0-288c0-26.5-21.5-48-48-48L48 64zm192 0c-26.5 0-48 21.5-48 48l0 288c0 26.5 21.5 48 48 48l32 0c26.5 0 48-21.5 48-48l0-288c0-26.5-21.5-48-48-48l-32 0z"/></svg>PAUSE
+                        </button>
+                        <button type="button" class="btn-pill" onclick="resetTimeline()" style="padding: 8px 10px;" title="Reset t = 0">
+                            Reset
+                        </button>
+                        <button type="button" class="btn-pill is-active-purple" id="pingPongBtn" onclick="togglePingPongMode()" style="padding: 8px 11px;">
+                            Bolak-Balik
+                        </button>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="mono" style="font-size: 11.5px; color: var(--text-white); min-width: 90px;" id="timeReadout">
+                            t = 0.00 / 4.0s
+                        </span>
+                        <input type="range" class="grad-range" id="timelineScrubber" min="0" max="1000" step="1" value="0" oninput="onScrubberSlide(this.value)">
+                    </div>
+
+                    <div class="transport-btns">
+                        <button type="button" class="btn-pill" id="spd05Btn" onclick="setPlaybackSpeed(0.5)" style="padding: 6px 9px; font-size: 11px;">0.5×</button>
+                        <button type="button" class="btn-pill is-active-blue" id="spd10Btn" onclick="setPlaybackSpeed(1.0)" style="padding: 6px 9px; font-size: 11px;">1.0×</button>
+                        <button type="button" class="btn-pill" id="spd20Btn" onclick="setPlaybackSpeed(2.0)" style="padding: 6px 9px; font-size: 11px;">2.0×</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- ==================== 5. RIGHT TELEMETRY & MONITORING BENTO (390px) ==================== -->
+        <aside class="right-bento-col">
+
+            <!-- BENTO 1: FEATURED ROYAL INDIGO TELEMETRY CARD (Ref Image 2 '#455DDC') -->
+            <div class="featured-indigo-card">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 9px;">
+                        <div style="width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        </div>
+                        <div>
+                            <div style="font-size: 13px; font-weight: 700; color: #FFFFFF;">Posisi End-Effector (TCP)</div>
+                            <div style="font-size: 10.5px; color: rgba(255,255,255,0.75);" id="payloadStatusText">Benda Kerja: Terkunci pada Capit</div>
+                        </div>
+                    </div>
+                    <span class="mono" style="font-size: 11px; font-weight: 700; background: rgba(17,20,32,0.35); padding: 4px 8px; border-radius: 99px;" id="tcpRadiusBadge">R = 3.88m</span>
+                </div>
+
+                <div class="featured-xyz-grid">
+                    <div class="featured-xyz-box">
+                        <span class="featured-xyz-lbl">X (REACH)</span>
+                        <span class="featured-xyz-val" id="teleX">+3.20m</span>
+                    </div>
+                    <div class="featured-xyz-box">
+                        <span class="featured-xyz-lbl">Y (LATERAL)</span>
+                        <span class="featured-xyz-val" id="teleY">-2.20m</span>
+                    </div>
+                    <div class="featured-xyz-box">
+                        <span class="featured-xyz-lbl">Z (ELEVASI)</span>
+                        <span class="featured-xyz-val" id="teleZ">+1.40m</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BENTO 2: CONCENTRIC MULTI-RING GAUGE & HYDRAULIC PISTON PILLARS (Ref Image 1 & 2) -->
+            <div class="ui-card">
+                <div class="card-header-row">
+                    <div>
+                        <h2 class="card-title">Beban Workspace & Hidrolik</h2>
+                        <p class="card-subtitle">Monitoring panjang langkah piston real-time</p>
+                    </div>
+                    <span class="pill-tag pill-mint" id="hydraulicHealthTag">PISTON SYNC</span>
+                </div>
+
+                <div class="donut-and-actuators-grid">
+                    <!-- Concentric SVG Rings ('Data' card from Ref Image 1) -->
+                    <div class="concentric-gauge-wrap">
+                        <svg viewBox="0 0 120 120">
+                            <!-- Background Tracks -->
+                            <circle cx="60" cy="60" r="50" fill="none" stroke="#181B24" stroke-width="7"/>
+                            <circle cx="60" cy="60" r="39" fill="none" stroke="#181B24" stroke-width="7"/>
+                            <circle cx="60" cy="60" r="28" fill="none" stroke="#181B24" stroke-width="7"/>
+
+                            <!-- Outer Ring: Workspace Reach % (Mint) -->
+                            <circle id="ringReach" cx="60" cy="60" r="50" fill="none" stroke="#43D1A7" stroke-width="7" stroke-linecap="round" stroke-dasharray="314.16" stroke-dashoffset="90"/>
+                            <!-- Middle Ring: Shoulder Hydraulic Stroke % (Purple) -->
+                            <circle id="ringCyl1" cx="60" cy="60" r="39" fill="none" stroke="#9646EF" stroke-width="7" stroke-linecap="round" stroke-dasharray="245.04" stroke-dashoffset="80"/>
+                            <!-- Inner Ring: Forearm Hydraulic Stroke % (Sky Blue) -->
+                            <circle id="ringCyl2" cx="60" cy="60" r="28" fill="none" stroke="#4DA6FF" stroke-width="7" stroke-linecap="round" stroke-dasharray="175.93" stroke-dashoffset="60"/>
+                        </svg>
+                        <div class="gauge-center-text">
+                            <span style="font-size: 9.5px; color: var(--text-slate); font-weight: 600;">REACH</span>
+                            <span class="mono" style="font-size: 15px; font-weight: 700; color: var(--text-white);" id="donutCenterVal">68%</span>
+                        </div>
+                    </div>
+
+                    <!-- Dual Vertical Hydraulic Pillar Bars (Ref Image 1 Center Sliders) -->
+                    <div class="hydraulic-pillars-box">
+                        <div class="pillar-col">
+                            <div class="pillar-track">
+                                <div class="pillar-fill mint" id="pillarCyl1" style="height: 62%;">
+                                    <div class="pillar-cap"></div>
+                                </div>
+                            </div>
+                            <span class="mono" style="font-size: 10px; font-weight: 600; color: var(--accent-mint);" id="pillarVal1">62%</span>
+                            <span style="font-size: 9.5px; color: var(--text-slate);">Piston L₂</span>
+                        </div>
+
+                        <div class="pillar-col">
+                            <div class="pillar-track">
+                                <div class="pillar-fill purple" id="pillarCyl2" style="height: 48%;">
+                                    <div class="pillar-cap"></div>
+                                </div>
+                            </div>
+                            <span class="mono" style="font-size: 10px; font-weight: 600; color: var(--accent-purple);" id="pillarVal2">48%</span>
+                            <span style="font-size: 9.5px; color: var(--text-slate);">Piston L₃</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Horizontal Progress Bars ('Lorem 72% / Ipsum 42%' from Ref Image 1) -->
+                <div class="horiz-bar-list">
+                    <div class="horiz-bar-item">
+                        <div class="horiz-bar-head">
+                            <span style="color: var(--text-silver);">Langkah Silinder Bahu (Twin Clevis)</span>
+                            <span class="mono" style="color: var(--accent-mint);" id="barTxtCyl1">1.24 m (64%)</span>
+                        </div>
+                        <div class="horiz-bar-track">
+                            <div class="horiz-bar-fill" id="barFillCyl1" style="width: 64%; background: var(--grad-mint);"></div>
+                        </div>
+                    </div>
+
+                    <div class="horiz-bar-item">
+                        <div class="horiz-bar-head">
+                            <span style="color: var(--text-silver);">Langkah Silinder Siku (Forearm)</span>
+                            <span class="mono" style="color: var(--accent-purple);" id="barTxtCyl2">0.92 m (52%)</span>
+                        </div>
+                        <div class="horiz-bar-track">
+                            <div class="horiz-bar-fill" id="barFillCyl2" style="width: 52%; background: var(--grad-purple);"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BENTO 3: SPLINE CURVE CHART WITH FLOATING CALLOUT BADGE (Ref Image 1 '1.802') -->
+            <div class="ui-card">
+                <div class="card-header-row">
+                    <div>
+                        <h2 class="card-title">Kurva Profil Kinematika</h2>
+                        <p class="card-subtitle" id="chartSubLabel">Sudut Sendi θ₁, θ₂, θ₃ terhadap waktu (t)</p>
+                    </div>
+                    <div style="display: flex; gap: 4px;">
+                        <button type="button" class="btn-pill is-active-mint" id="plotTabPos" onclick="setPlotMode('pos')" style="padding: 4px 9px; font-size: 10.5px;">θ(t)</button>
+                        <button type="button" class="btn-pill" id="plotTabVel" onclick="setPlotMode('vel')" style="padding: 4px 9px; font-size: 10.5px;">ω(t)</button>
+                        <button type="button" class="btn-pill" id="plotTabCyl" onclick="setPlotMode('cyl')" style="padding: 4px 9px; font-size: 10.5px;">Piston</button>
+                    </div>
+                </div>
+
+                <div class="spline-chart-box">
+                    <canvas id="kinematicChartCanvas"></canvas>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; font-size: 10.5px; color: var(--text-slate);">
+                    <span><strong style="color: var(--accent-mint);">●</strong> Sendi 1 (θ₁)</span>
+                    <span><strong style="color: var(--accent-purple);">●</strong> Sendi 2 (θ₂)</span>
+                    <span><strong style="color: var(--accent-orange);">●</strong> Sendi 3 (θ₃)</span>
+                </div>
+            </div>
+
+            <!-- BENTO 4: JOINT TELEMETRY EQUALIZER & SE(3) MATRIX (Ref Image 1, 2 & 3) -->
+            <div class="ui-card">
+                <div class="card-header-row">
+                    <div>
+                        <h2 class="card-title">Distribusi Sendi & Matriks T₀³</h2>
+                        <p class="card-subtitle">Kecepatan sudut & matriks homogen 4×4</p>
+                    </div>
+                    <span class="mono" style="font-size: 11px; color: var(--accent-sky);" id="activeJointsSummary">3-DOF RRR</span>
+                </div>
+
+                <!-- Stacked Multi-Segment Load Bar (Ref Image 2 'Meeting room') -->
+                <div class="stacked-bar-track">
+                    <div class="stacked-seg" id="stackSeg1" style="width: 35%; background: var(--accent-mint);"></div>
+                    <div class="stacked-seg" id="stackSeg2" style="width: 40%; background: var(--accent-purple);"></div>
+                    <div class="stacked-seg" id="stackSeg3" style="width: 25%; background: var(--accent-orange);"></div>
+                </div>
+
+                <div class="equalizer-row">
+                    <!-- Live Joint Readout List -->
+                    <div style="display: flex; flex-direction: column; gap: 5px; font-size: 11px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-silver);"><strong style="color: var(--accent-mint);">●</strong> θ₁ Base</span>
+                            <span class="mono" id="j1Readout">-34.0° | 0°/s</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-silver);"><strong style="color: var(--accent-purple);">●</strong> θ₂ Bahu</span>
+                            <span class="mono" id="j2Readout">+42.0° | 0°/s</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-silver);"><strong style="color: var(--accent-orange);">●</strong> θ₃ Siku</span>
+                            <span class="mono" id="j3Readout">-72.0° | 0°/s</span>
+                        </div>
+                    </div>
+
+                    <!-- 8-Bar Vertical Capsule Equalizer (Ref Image 1 & 3) -->
+                    <div class="capsule-bars-wrap" id="equalizerBars">
+                        <div class="cap-bar-track"><div class="cap-bar-fill" style="height: 45%; background: var(--accent-indigo);"></div></div>
+                        <div class="cap-bar-track"><div class="cap-bar-fill" style="height: 70%; background: var(--accent-sky);"></div></div>
+                        <div class="cap-bar-track"><div class="cap-bar-fill" style="height: 55%; background: var(--accent-mint);"></div></div>
+                        <div class="cap-bar-track"><div class="cap-bar-fill" style="height: 85%; background: var(--accent-purple);"></div></div>
+                        <div class="cap-bar-track"><div class="cap-bar-fill" style="height: 62%; background: var(--accent-mint);"></div></div>
+                        <div class="cap-bar-track"><div class="cap-bar-fill" style="height: 40%; background: var(--accent-orange);"></div></div>
+                        <div class="cap-bar-track"><div class="cap-bar-fill" style="height: 75%; background: var(--accent-sky);"></div></div>
+                        <div class="cap-bar-track"><div class="cap-bar-fill" style="height: 50%; background: var(--accent-purple);"></div></div>
+                    </div>
+                </div>
+
+                <!-- 4x4 Homogeneous Transformation Matrix SE(3) -->
+                <div class="se3-grid">
+                    <div class="se3-cell" id="m00">+0.82</div>
+                    <div class="se3-cell" id="m01">+0.57</div>
+                    <div class="se3-cell" id="m02">+0.00</div>
+                    <div class="se3-cell trans" id="m03">+3.20</div>
+
+                    <div class="se3-cell" id="m10">-0.57</div>
+                    <div class="se3-cell" id="m11">+0.82</div>
+                    <div class="se3-cell" id="m12">+0.00</div>
+                    <div class="se3-cell trans" id="m13">-2.20</div>
+
+                    <div class="se3-cell" id="m20">+0.00</div>
+                    <div class="se3-cell" id="m21">+0.00</div>
+                    <div class="se3-cell" id="m22">+1.00</div>
+                    <div class="se3-cell trans" id="m23">+1.40</div>
+
+                    <div class="se3-cell" id="m30">0.00</div>
+                    <div class="se3-cell" id="m31">0.00</div>
+                    <div class="se3-cell" id="m32">0.00</div>
+                    <div class="se3-cell" id="m33">1.00</div>
+                </div>
+            </div>
+
+        </aside>
+
+    </div>
+
+
+    <!-- ==================== MODULAR JAVASCRIPT ENGINE (ES6 MODULES) ==================== -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

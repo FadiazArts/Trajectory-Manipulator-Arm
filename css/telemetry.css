@@ -1,0 +1,271 @@
+/* ==================== 5. RIGHT TELEMETRY & MONITORING BENTO (390px) ==================== */
+.right-bento-col {
+    grid-column: 4 / 5;
+    grid-row: 2 / 3;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    padding-right: 2px;
+}
+
+/* Featured Indigo Card (Ref Image 2 'Illumination 1,209' Card) */
+.featured-indigo-card {
+    background: var(--grad-featured);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    box-shadow: 0 12px 28px -6px rgba(69, 93, 220, 0.55);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.featured-xyz-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.featured-xyz-box {
+    background: rgba(17, 20, 32, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    padding: 7px 9px;
+    display: flex;
+    flex-direction: column;
+}
+
+.featured-xyz-lbl {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.72);
+    font-weight: 600;
+}
+
+.featured-xyz-val {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 700;
+    color: #FFFFFF;
+}
+
+/* Multi-Ring Concentric Gauge + Dual Vertical Sliders (Ref Image 1 & 2) */
+.donut-and-actuators-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 10px;
+    align-items: center;
+}
+
+.concentric-gauge-wrap {
+    position: relative;
+    width: 126px;
+    height: 126px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.concentric-gauge-wrap svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.gauge-center-text {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Vertical Capsule Pillar Bars (Ref Image 1 Center Vertical Sliders) */
+.hydraulic-pillars-box {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 126px;
+    background: rgba(20, 23, 32, 0.55);
+    border: 1px solid rgba(160, 169, 192, 0.08);
+    border-radius: 12px;
+    padding: 10px 8px;
+}
+
+.pillar-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    height: 100%;
+}
+
+.pillar-track {
+    width: 14px;
+    flex: 1;
+    background: #151821;
+    border-radius: var(--radius-pill);
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 2px;
+    border: 1px solid rgba(160, 169, 192, 0.12);
+}
+
+.pillar-fill {
+    width: 100%;
+    border-radius: var(--radius-pill);
+    position: relative;
+    transition: height 0.1s linear;
+}
+
+.pillar-fill.mint {
+    background: linear-gradient(180deg, #00E5B8 0%, #43D1A7 100%);
+    box-shadow: 0 0 10px rgba(67, 209, 167, 0.45);
+}
+
+.pillar-fill.purple {
+    background: linear-gradient(180deg, #9646EF 0%, #6C35DE 100%);
+    box-shadow: 0 0 10px rgba(150, 70, 239, 0.45);
+}
+
+.pillar-cap {
+    position: absolute;
+    top: -5px;
+    left: -2px;
+    right: -2px;
+    height: 10px;
+    border-radius: 3px;
+    background: #FFFFFF;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+}
+
+/* Horizontal Progress Bars (Ref Image 1 'Lorem 72% / Ipsum 42%') */
+.horiz-bar-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.horiz-bar-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.horiz-bar-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11.5px;
+    font-weight: 600;
+}
+
+.horiz-bar-track {
+    height: 5px;
+    width: 100%;
+    background: #161922;
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+}
+
+.horiz-bar-fill {
+    height: 100%;
+    border-radius: var(--radius-pill);
+    transition: width 0.12s linear;
+}
+
+/* Spline Chart Container with Floating Callout Badge (Ref Image 1 '1.802') */
+.spline-chart-box {
+    position: relative;
+    width: 100%;
+    height: 162px;
+    background: rgba(19, 22, 31, 0.72);
+    border: 1px solid rgba(160, 169, 192, 0.09);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.spline-chart-box canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Vertical Equalizer Capsule Bars + Stacked Load Bar (Ref Image 1, 2 & 3) */
+.equalizer-row {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: 12px;
+    align-items: center;
+}
+
+.capsule-bars-wrap {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 68px;
+    padding: 6px 8px;
+    background: rgba(20, 23, 32, 0.55);
+    border-radius: 10px;
+    border: 1px solid rgba(160, 169, 192, 0.08);
+}
+
+.cap-bar-track {
+    width: 7px;
+    height: 100%;
+    background: rgba(114, 124, 148, 0.16);
+    border-radius: var(--radius-pill);
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+}
+
+.cap-bar-fill {
+    width: 100%;
+    border-radius: var(--radius-pill);
+    transition: height 0.12s ease;
+}
+
+/* Stacked Multi-Color Progress Bar (Ref Image 2 'Meeting room 12') */
+.stacked-bar-track {
+    height: 6px;
+    width: 100%;
+    background: #161922;
+    border-radius: var(--radius-pill);
+    display: flex;
+    overflow: hidden;
+    gap: 2px;
+}
+
+.stacked-seg {
+    height: 100%;
+    border-radius: var(--radius-pill);
+    transition: width 0.2s ease;
+}
+
+/* 4x4 SE(3) Compact Matrix Grid */
+.se3-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+}
+
+.se3-cell {
+    background: rgba(20, 23, 32, 0.75);
+    border: 1px solid rgba(160, 169, 192, 0.08);
+    border-radius: 6px;
+    padding: 4px 6px;
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--text-silver);
+}
+
+.se3-cell.trans {
+    color: var(--accent-mint);
+    font-weight: 600;
+    background: rgba(67, 209, 167, 0.06);
+    border-color: rgba(160, 169, 192, 0.08);
+}
