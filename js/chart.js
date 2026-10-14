@@ -30,16 +30,31 @@ export function setPlotMode(mode) {
     renderSplineChart();
 }
 
+let lastChartRender = 0;
+
 export function renderSplineChart() {
     if (!chartCanvas) {
         chartCanvas = document.getElementById('kinematicChartCanvas');
     }
     if (!chartCanvas || !state.samples || state.samples.length === 0) return;
 
+    // Skip drawing if canvas element is hidden on mobile
+    if (chartCanvas.offsetParent === null) return;
+
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+
+    // Throttle 2D canvas redrawing during active playback on mobile to conserve CPU & battery
+    if (isMobile && state.isPlaying) {
+        const now = performance.now();
+        if (now - lastChartRender < 45) return;
+        lastChartRender = now;
+    }
+
     const rect = chartCanvas.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return;
 
-    const dpr = window.devicePixelRatio || 1;
+    // On mobile screens, cap DPR at 1.0 to avoid heavy bitmap allocations
+    const dpr = isMobile ? 1.0 : (window.devicePixelRatio || 1);
     const targetW = Math.floor(rect.width * dpr);
     const targetH = Math.floor(rect.height * dpr);
     if (chartCanvas.width !== targetW || chartCanvas.height !== targetH) {

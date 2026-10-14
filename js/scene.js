@@ -27,10 +27,20 @@ export function initScene(container) {
     camera = new THREE.PerspectiveCamera(42, 1, 0.1, 120);
     camera.position.set(8.0, 5.8, 8.2);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+
+    renderer = new THREE.WebGLRenderer({
+        antialias: !isMobile,
+        powerPreference: isMobile ? 'default' : 'high-performance'
+    });
+    renderer.setPixelRatio(isMobile ? 1.0 : Math.min(window.devicePixelRatio || 1, 2));
+
+    if (isMobile) {
+        renderer.shadowMap.enabled = false;
+    } else {
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    }
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
     container.appendChild(renderer.domElement);
@@ -44,25 +54,29 @@ export function initScene(container) {
     controls.maxDistance = 26;
 
     // Ambient & Studio Lighting
-    scene.add(new THREE.AmbientLight(0xdbeafe, 0.68));
+    scene.add(new THREE.AmbientLight(0xdbeafe, isMobile ? 0.85 : 0.68));
 
     const hemiLight = new THREE.HemisphereLight(0xe2e8f0, 0x1e293b, 0.65);
     hemiLight.position.set(0, 18, 0);
     scene.add(hemiLight);
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.38);
+    const keyLight = new THREE.DirectionalLight(0xffffff, isMobile ? 1.25 : 1.38);
     keyLight.position.set(9, 16, 9);
-    keyLight.castShadow = true;
-    keyLight.shadow.mapSize.width = 2048;
-    keyLight.shadow.mapSize.height = 2048;
-    keyLight.shadow.camera.near = 1;
-    keyLight.shadow.camera.far = 38;
-    const sb = 9.5;
-    keyLight.shadow.camera.left = -sb;
-    keyLight.shadow.camera.right = sb;
-    keyLight.shadow.camera.top = sb;
-    keyLight.shadow.camera.bottom = -sb;
-    keyLight.shadow.bias = -0.0005;
+    if (!isMobile) {
+        keyLight.castShadow = true;
+        keyLight.shadow.mapSize.width = 2048;
+        keyLight.shadow.mapSize.height = 2048;
+        keyLight.shadow.camera.near = 1;
+        keyLight.shadow.camera.far = 38;
+        const sb = 9.5;
+        keyLight.shadow.camera.left = -sb;
+        keyLight.shadow.camera.right = sb;
+        keyLight.shadow.camera.top = sb;
+        keyLight.shadow.camera.bottom = -sb;
+        keyLight.shadow.bias = -0.0005;
+    } else {
+        keyLight.castShadow = false;
+    }
     scene.add(keyLight);
 
     const rimLight = new THREE.DirectionalLight(0x9646ef, 0.48);
@@ -104,18 +118,20 @@ export function initScene(container) {
 export function rebuildEnvelopeVisual() {
     if (!envelopeGroup) return;
     while (envelopeGroup.children.length > 0) envelopeGroup.remove(envelopeGroup.children[0]);
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
     const maxR = state.L2 + state.L3;
     const ringMesh = new THREE.Mesh(
-        new THREE.RingGeometry(maxR - 0.04, maxR, 96),
+        new THREE.RingGeometry(maxR - 0.04, maxR, isMobile ? 48 : 96),
         new THREE.MeshBasicMaterial({ color: 0x43d1a7, side: THREE.DoubleSide, transparent: true, opacity: 0.42 })
     );
     ringMesh.rotation.x = -Math.PI / 2;
     ringMesh.position.y = 0.01;
     envelopeGroup.add(ringMesh);
 
+    const arcSteps = isMobile ? 32 : 64;
     const arcPts = [];
-    for (let i = 0; i <= 64; i++) {
-        const ang = (i / 64) * Math.PI;
+    for (let i = 0; i <= arcSteps; i++) {
+        const ang = (i / arcSteps) * Math.PI;
         arcPts.push(new THREE.Vector3(Math.cos(ang) * maxR, state.L1 + Math.sin(ang) * maxR, 0));
     }
     const arcLine = new THREE.Line(

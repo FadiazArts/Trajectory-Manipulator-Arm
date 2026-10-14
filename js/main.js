@@ -102,6 +102,10 @@ export function handleViewportResize() {
     if (!containerEl) {
         containerEl = document.getElementById('canvasContainer');
     }
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+    if (renderer) {
+        renderer.setPixelRatio(isMobile ? 1.0 : Math.min(window.devicePixelRatio || 1, 2));
+    }
     if (containerEl && camera && renderer) {
         const rect = containerEl.getBoundingClientRect();
         if (rect.width > 0 && rect.height > 0) {
