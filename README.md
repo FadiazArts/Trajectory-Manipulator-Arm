@@ -1,5 +1,10 @@
 # FirmDev Studio — 3-Link Manipulator & Hydraulic Trajectory 3D Simulation
 
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-black?style=for-the-badge&logo=vercel)](https://trajectory-manipulator-arm.vercel.app)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/FadiazArts/Trajectory-Manipulator-Arm)
+
+🌐 **Live Demo**: [https://trajectory-manipulator-arm.vercel.app](https://trajectory-manipulator-arm.vercel.app)
+
 Aplikasi simulasi interaktif 3D untuk robot manipulator artikulasi 3-DOF dengan sistem aktuator hidrolik non-floating dan interpolasi trayektori multi-mode.
 
 Proyek ini telah dimodularisasi secara profesional dengan memisahkan kode menjadi lapisan **HTML**, **CSS**, dan **JavaScript (ES Modules)** sesuai dengan standar rekayasa perangkat lunak modern (*Clean Architecture*, *Separation of Concerns*, dan *Single Responsibility Principle*).
