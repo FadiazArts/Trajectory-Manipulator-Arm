@@ -141,6 +141,11 @@ export function animateLoop(now) {
 }
 
 export function initApp() {
+    // Explicitly guarantee simulation starts in paused state at t = 0
+    state.isPlaying = false;
+    state.progress = 0.0;
+    state.direction = 1;
+
     containerEl = document.getElementById('canvasContainer');
     initScene(containerEl);
     initChart(document.getElementById('kinematicChartCanvas'));
