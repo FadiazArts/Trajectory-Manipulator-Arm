@@ -8,3 +8,4 @@ node_modules/
 # System files
 .DS_Store
 Thumbs.db
+.vercel
