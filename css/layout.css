@@ -9,29 +9,6 @@
     padding: 12px;
 }
 
-@media (max-width: 1320px) {
-    html, body {
-        overflow-y: auto;
-        height: auto;
-    }
-    .app-shell {
-        grid-template-columns: 56px 1fr;
-        grid-template-rows: auto;
-        height: auto;
-    }
-    .top-kpi-bar {
-        grid-column: 2 / -1 !important;
-    }
-    .left-control-col,
-    .center-stage-col,
-    .right-bento-col {
-        grid-column: 2 / -1 !important;
-    }
-    .center-stage-col {
-        min-height: 520px;
-    }
-}
-
 /* ==================== 1. LEFT NAVIGATION ICON RAIL (Ref Image 3) ==================== */
 .nav-rail {
     grid-row: 1 / -1;

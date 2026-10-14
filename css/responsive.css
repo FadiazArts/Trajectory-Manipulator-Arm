@@ -1,0 +1,392 @@
+/* ==========================================================================
+   FirmDev Studio — 3-Link Manipulator & Hydraulic Trajectory 3D
+   Responsive Design Module (Smartphones & Tablets)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. LAPTOP & TABLET LANDSCAPE (max-width: 1200px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1200px) {
+    html, body {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        height: auto !important;
+    }
+
+    .app-shell {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        height: auto !important;
+        padding: 12px !important;
+        gap: 12px !important;
+    }
+
+    .nav-rail {
+        flex-direction: row !important;
+        width: 100% !important;
+        height: 52px !important;
+        padding: 0 14px !important;
+        justify-content: space-between !important;
+        order: 1;
+    }
+
+    .rail-menu {
+        flex-direction: row !important;
+        width: auto !important;
+        gap: 8px !important;
+    }
+
+    .rail-btn.is-active::before {
+        left: 8px !important;
+        right: 8px !important;
+        top: auto !important;
+        bottom: -6px !important;
+        width: auto !important;
+        height: 3px !important;
+        border-radius: 4px 4px 0 0 !important;
+    }
+
+    .top-kpi-bar {
+        order: 2;
+        width: 100% !important;
+    }
+
+    .center-stage-col {
+        order: 3;
+        min-height: 480px !important;
+        height: 55vh !important;
+        width: 100% !important;
+    }
+
+    .left-control-col {
+        order: 4;
+        width: 100% !important;
+        max-height: none !important;
+        overflow-y: visible !important;
+    }
+
+    .right-bento-col {
+        order: 5;
+        width: 100% !important;
+        max-height: none !important;
+        overflow-y: visible !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   2. TABLET PORTRAIT & MOBILE (max-width: 768px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+    /* Touch gesture handling for Three.js canvas */
+    #canvasContainer,
+    #canvasContainer canvas {
+        touch-action: none !important;
+    }
+
+    html, body {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        height: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .app-shell {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        height: auto !important;
+        padding: 8px !important;
+        gap: 10px !important;
+        padding-bottom: 76px !important; /* Space for bottom fixed nav bar */
+    }
+
+    /* Fixed Bottom Ergonomic Navigation Rail */
+    .nav-rail {
+        position: fixed !important;
+        bottom: 8px !important;
+        left: 8px !important;
+        right: 8px !important;
+        width: calc(100% - 16px) !important;
+        height: 54px !important;
+        background: rgba(23, 26, 36, 0.94) !important;
+        backdrop-filter: blur(18px) !important;
+        -webkit-backdrop-filter: blur(18px) !important;
+        border: 1px solid rgba(160, 169, 192, 0.20) !important;
+        border-radius: 16px !important;
+        padding: 0 10px !important;
+        flex-direction: row !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6) !important;
+        z-index: 999 !important;
+        order: 99 !important;
+    }
+
+    .rail-brand {
+        display: none !important; /* Conceal brand icon to give maximum room to tool buttons */
+    }
+
+    .rail-menu {
+        flex-direction: row !important;
+        width: 100% !important;
+        justify-content: space-around !important;
+        gap: 4px !important;
+    }
+
+    .rail-btn {
+        width: 42px !important;
+        height: 42px !important;
+        border-radius: 12px !important;
+    }
+
+    .rail-btn svg {
+        width: 19px !important;
+        height: 19px !important;
+    }
+
+    .rail-btn.is-active::before {
+        display: none !important;
+    }
+
+    /* Swipeable Horizontal Top KPI Header Strip */
+    .top-kpi-bar {
+        order: 1 !important;
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        scroll-snap-type: x mandatory !important;
+        -webkit-overflow-scrolling: touch !important;
+        gap: 8px !important;
+        padding-bottom: 4px !important;
+        width: 100% !important;
+        scrollbar-width: none;
+    }
+
+    .top-kpi-bar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .kpi-card {
+        flex: 0 0 160px !important;
+        scroll-snap-align: start !important;
+        padding: 8px 10px !important;
+        border-radius: 12px !important;
+    }
+
+    .kpi-value {
+        font-size: 14px !important;
+    }
+
+    .icon-badge {
+        width: 32px !important;
+        height: 32px !important;
+        border-radius: 8px !important;
+    }
+
+    /* Hero 3D Stage / Viewport (Placed at Top on Mobile) */
+    .center-stage-col {
+        order: 2 !important;
+        width: 100% !important;
+        height: 42vh !important;
+        min-height: 320px !important;
+        max-height: 420px !important;
+        border-radius: 14px !important;
+    }
+
+    .stage-top-overlay {
+        top: 8px !important;
+        left: 8px !important;
+        right: 8px !important;
+        gap: 6px !important;
+    }
+
+    .overlay-pill-group {
+        padding: 3px !important;
+        gap: 2px !important;
+        overflow-x: auto !important;
+        max-width: 100% !important;
+        scrollbar-width: none;
+    }
+
+    .overlay-pill-group::-webkit-scrollbar {
+        display: none;
+    }
+
+    .stage-chip-btn {
+        font-size: 10px !important;
+        padding: 4px 8px !important;
+        white-space: nowrap !important;
+    }
+
+    /* Mobile Transport Dock */
+    .stage-bottom-dock {
+        padding: 8px 10px !important;
+        gap: 8px !important;
+    }
+
+    .node-stepper-bar {
+        display: none !important; /* Hide milestone dots to conserve vertical mobile room */
+    }
+
+    .transport-main-row {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+
+    .transport-btns {
+        display: flex !important;
+        width: 100% !important;
+        justify-content: space-between !important;
+        gap: 6px !important;
+    }
+
+    .transport-btns .btn-pill {
+        flex: 1 !important;
+        justify-content: center !important;
+        padding: 8px 4px !important;
+        font-size: 11px !important;
+    }
+
+    /* Mobile Segmented Section Switcher Tabs */
+    .mobile-section-tabs {
+        order: 3 !important;
+        display: flex !important;
+        background: #171A24;
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius-pill);
+        padding: 3px;
+        gap: 4px;
+        width: 100%;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    .mobile-tab-btn {
+        flex: 1;
+        padding: 9px 12px;
+        border: none;
+        background: transparent;
+        color: var(--text-slate);
+        border-radius: var(--radius-pill);
+        font-family: var(--font-sans);
+        font-size: 11.5px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+    }
+
+    .mobile-tab-btn.is-active {
+        background: var(--grad-blue);
+        color: #FFFFFF;
+        box-shadow: 0 4px 12px rgba(69, 93, 220, 0.45);
+    }
+
+    /* Mobile Section Panels */
+    .left-control-col {
+        order: 4 !important;
+        width: 100% !important;
+        overflow-y: visible !important;
+    }
+
+    .right-bento-col {
+        order: 5 !important;
+        width: 100% !important;
+        overflow-y: visible !important;
+    }
+
+    /* When controlled by tab switcher on mobile */
+    .left-control-col.mobile-hidden,
+    .right-bento-col.mobile-hidden {
+        display: none !important;
+    }
+
+    /* Touch Friendly Sliders & Controls */
+    .preset-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 6px !important;
+    }
+
+    .preset-btn {
+        padding: 8px !important;
+    }
+
+    .coord-row {
+        grid-template-columns: 60px 1fr 40px !important;
+        gap: 6px !important;
+    }
+
+    .coord-num-input {
+        width: 40px !important;
+        font-size: 11px !important;
+        padding: 4px !important;
+    }
+
+    .donut-and-actuators-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .concentric-gauge-wrap {
+        margin: 0 auto;
+    }
+
+    #kinematicChartCanvas {
+        height: 170px !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   3. DESKTOP ONLY RESET (min-width: 769px)
+   -------------------------------------------------------------------------- */
+@media (min-width: 769px) {
+    .mobile-section-tabs {
+        display: none !important;
+    }
+
+    .left-control-col.mobile-hidden,
+    .right-bento-col.mobile-hidden {
+        display: flex !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   4. COMPACT SMARTPHONES (max-width: 480px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+    .app-shell {
+        padding: 6px !important;
+        padding-bottom: 72px !important;
+    }
+
+    .center-stage-col {
+        height: 38vh !important;
+        min-height: 285px !important;
+    }
+
+    .kpi-card {
+        flex: 0 0 145px !important;
+    }
+
+    .folder-tab {
+        padding: 7px 10px !important;
+        font-size: 10.5px !important;
+    }
+
+    .featured-xyz-grid {
+        gap: 5px !important;
+    }
+
+    .featured-xyz-val {
+        font-size: 12.5px !important;
+    }
+
+    .se3-cell {
+        font-size: 9.5px !important;
+        padding: 3px !important;
+    }
+}

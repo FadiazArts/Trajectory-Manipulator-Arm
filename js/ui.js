@@ -75,6 +75,29 @@ export function switchFolderTab(tab) {
     }
 }
 
+/**
+ * Switches between Controls panel and Telemetry dashboard on mobile devices.
+ */
+export function switchMobileSection(section) {
+    const leftCol = document.getElementById('leftControlCol');
+    const rightCol = document.getElementById('rightBentoCol');
+    const tabControls = document.getElementById('mTabBtnControls');
+    const tabTelemetry = document.getElementById('mTabBtnTelemetry');
+
+    if (section === 'controls') {
+        if (leftCol) leftCol.classList.remove('mobile-hidden');
+        if (rightCol) rightCol.classList.add('mobile-hidden');
+        if (tabControls) tabControls.classList.add('is-active');
+        if (tabTelemetry) tabTelemetry.classList.remove('is-active');
+    } else {
+        if (leftCol) leftCol.classList.add('mobile-hidden');
+        if (rightCol) rightCol.classList.remove('mobile-hidden');
+        if (tabControls) tabControls.classList.remove('is-active');
+        if (tabTelemetry) tabTelemetry.classList.add('is-active');
+        setTimeout(renderSplineChart, 60);
+    }
+}
+
 export function setInputMode(mode) {
     state.inputMode = mode;
     document.getElementById('btnModeCart').className =

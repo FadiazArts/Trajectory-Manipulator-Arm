@@ -25,6 +25,7 @@ Proyek ini telah dimodularisasi secara profesional dengan memisahkan kode menjad
 │   ├── controls.css                                  # Control panel, folder tabs, sliders, preset buttons
 │   ├── viewport.css                                  # 3D canvas viewport, HUD camera tools, transport dock
 │   ├── telemetry.css                                 # Bento telemetry dashboard, spline chart, ring gauges, SE(3) matrix
+│   ├── responsive.css                                # Desain responsif mobile & tablet (smartphones, touch gestures, bottom bar)
 │   └── style.css                                     # Master stylesheet (mengimpor seluruh modul CSS)
 │
 └── js/                                               # Modular JavaScript (ES6+ Modules)

@@ -11,6 +11,7 @@ import { initChart, renderSplineChart, setPlotMode } from './chart.js';
 import {
     syncRangeGradientFill,
     switchFolderTab,
+    switchMobileSection,
     setInputMode,
     setElbowSign,
     recomputeBothWaypointsFromCartesian,
@@ -55,6 +56,7 @@ onTrajectoryComputed(() => {
 // Expose interaction handlers to window scope for seamless HTML inline event bindings
 Object.assign(window, {
     switchFolderTab,
+    switchMobileSection,
     setInputMode,
     setElbowSign,
     recomputeBothWaypointsFromCartesian,
@@ -164,6 +166,9 @@ export function initApp() {
     initKeyboardShortcuts();
 
     window.addEventListener('resize', handleViewportResize);
+    window.addEventListener('orientationchange', () => {
+        setTimeout(handleViewportResize, 150);
+    });
 
     lastTick = performance.now();
     requestAnimationFrame(animateLoop);

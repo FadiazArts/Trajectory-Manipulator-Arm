@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
     <title>FirmDev Studio — 3-Link Manipulator & Hydraulic Trajectory 3D</title>
 
     <!-- Three.js r128 & OrbitControls -->
@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Modular Stylesheet Architecture -->
-    <link rel="stylesheet" href="css/style.css?v=2.2.0">
+    <link rel="stylesheet" href="css/style.css?v=2.3.0">
 </head>
 <body>
 
@@ -137,7 +137,7 @@
         </header>
 
         <!-- ==================== 3. LEFT CONTROL COLUMN (370px) ==================== -->
-        <aside class="left-control-col">
+        <aside class="left-control-col" id="leftControlCol">
 
             <!-- CARD 1: FOLDER-TABBED WAYPOINT & GEOMETRY CONTROLLER (Ref Image 1 Bottom-Right) -->
             <div class="folder-card-wrapper">
@@ -534,8 +534,18 @@
 
         </main>
 
+        <!-- Mobile Section Segmented Switcher (Visible on Mobile <= 768px) -->
+        <div class="mobile-section-tabs" id="mobileSectionTabs">
+            <button type="button" class="mobile-tab-btn is-active" id="mTabBtnControls" onclick="switchMobileSection('controls')">
+                <i class="fa-solid fa-sliders"></i> Kontrol & Parameter
+            </button>
+            <button type="button" class="mobile-tab-btn" id="mTabBtnTelemetry" onclick="switchMobileSection('telemetry')">
+                <i class="fa-solid fa-chart-line"></i> Telemetri & Grafik
+            </button>
+        </div>
+
         <!-- ==================== 5. RIGHT TELEMETRY & MONITORING BENTO (390px) ==================== -->
-        <aside class="right-bento-col">
+        <aside class="right-bento-col mobile-hidden" id="rightBentoCol">
 
             <!-- BENTO 1: FEATURED ROYAL INDIGO TELEMETRY CARD (Ref Image 2 '#455DDC') -->
             <div class="featured-indigo-card">
@@ -750,6 +760,6 @@
 
 
     <!-- ==================== MODULAR JAVASCRIPT ENGINE (ES6 MODULES) ==================== -->
-    <script type="module" src="js/main.js?v=2.2.0"></script>
+    <script type="module" src="js/main.js?v=2.3.0"></script>
 </body>
 </html>
